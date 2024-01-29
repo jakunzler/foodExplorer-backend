@@ -58,7 +58,7 @@ ___
 ### 🚧 Executando o BackEnd
 
 ```bash
-# No BackEnd insira uma porta e um secret no arquivo .env vazio
+# No BackEnd insira uma porta e as demais variáveis de ambiente no arquivo .env vazio
   PORT=
   SECRET_KEY_JWT=
   TOKEN_EXPIRES_IN=
@@ -69,6 +69,9 @@ $ cd foodExplorer-backend
 
 # Instale as dependências necessárias
 $ yarn
+
+# Ative as migrações do gerenciador de banco de dados
+$ yarn prisma migrate dev
 
 # Agora inicie o servidor do BackEnd
 $ yarn dev
