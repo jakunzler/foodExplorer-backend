@@ -1,0 +1,326 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:food_explorer_db.db"
+}
+
+model User {
+  id                 String               @id @default(uuid())
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  name               String
+  email              String               @unique
+  password           String
+  avatar             String?
+  birthday           DateTime?
+  isActive           Boolean?             @default(true) @map("is_active")
+  deletedBy          String?              @map("deleted_by")
+  createdBy          String?              @map("created_by")
+  firstLogin         DateTime?            @map("first_login")
+  session            Session[]
+  telephone          Telephone[]
+  message            Message[]
+  deliveryAddress    DeliveryAddress[]
+  userRestaurant     UserRestaurant[]
+  orders             Order[]
+  userFavoriteDishes UserFavoriteDishes[]
+
+  @@map("users")
+}
+
+model PermissionGroups {
+  id        String                 @id @default(uuid())
+  createdAt DateTime               @default(now()) @map("created_at")
+  updatedAt DateTime               @updatedAt @map("updated_at")
+  name      String                 @unique
+  type      String                 @default("USER")
+  users     UserPermissionGroups[]
+  role      String                 @default("IS_CLIENT")
+
+  @@unique([type, role])
+  @@map("permission_groups")
+}
+
+model UserPermissionGroups {
+  id                String           @id @default(uuid())
+  createdAt         DateTime         @default(now()) @map("created_at")
+  deletedAt         DateTime?        @map("deleted_at")
+  userId            String?          @map("user_id")
+  permissionGroup   PermissionGroups @relation(fields: [permissionGroupId], references: [id])
+  permissionGroupId String           @map("permission_group_id")
+
+  @@unique([userId, permissionGroupId])
+  @@map("user_permission_groups")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @map("user_id")
+  ip        String
+  userAgent String?  @map("user_agent")
+  country   String?
+  region    String?
+  language  String?
+  latitude  Float?
+  longitude Float?
+
+  @@map("sessions")
+}
+
+model Telephone {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  type      String
+  number    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @map("user_id")
+
+  @@map("telephones")
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  isRead    Boolean  @default(false) @map("is_read")
+  title     String
+  content   String?
+  type      String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @map("user_id")
+
+  @@map("message")
+}
+
+model DeliveryAddress {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  street     String
+  number     String
+  complement String?
+  sector     String
+  city       String
+  state      String
+  country    String
+  zipCode    String   @map("zip_code")
+  latitude   Float?
+  longitude  Float?
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String   @map("user_id")
+
+  @@map("delivery_addresses")
+}
+
+model Restaurant {
+  id             String           @id @default(uuid())
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  name           String
+  cnpj           String           @unique
+  isActive       Boolean          @default(true) @map("is_active")
+  deletedBy      String?          @map("deleted_by")
+  createdBy      String?          @map("created_by")
+  address        Address[]
+  userRestaurant UserRestaurant[]
+  orders         Order[]
+  dishes         Dish[]
+
+  @@map("restaurants")
+}
+
+model UserRestaurant {
+  id           String     @id @default(uuid())
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String     @map("user_id")
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String     @map("restaurant_id")
+
+  @@map("user_restaurants")
+}
+
+model Address {
+  id           String     @id @default(uuid())
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  street       String
+  number       String
+  complement   String?
+  sector       String
+  city         String
+  state        String
+  country      String
+  zipCode      String     @map("zip_code")
+  latitude     Float?
+  longitude    Float?
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String     @map("restaurant_id")
+
+  @@unique([restaurantId], name: "restaurant_address_unique")
+  @@map("addresses")
+}
+
+model Category {
+  id          String         @id @default(uuid())
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  name        String
+  description String?
+  isActive    Boolean        @default(true) @map("is_active")
+  deletedBy   String?        @map("deleted_by")
+  createdBy   String?        @map("created_by")
+  dishes      DishCategory[]
+
+  @@map("categories")
+}
+
+model Dish {
+  id                  String               @id @default(uuid())
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  name                String
+  status              String               @default("UNAVAILABLE")
+  summary_description String?
+  full_description    String?
+  price               Float
+  image               String?
+  isActive            Boolean              @default(true) @map("is_active")
+  deletedBy           String?              @map("deleted_by")
+  createdBy           String?              @map("created_by")
+  restaurant          Restaurant           @relation(fields: [restaurantId], references: [id])
+  restaurantId        String               @map("restaurant_id")
+  categories          DishCategory[]
+  ingredients         String?
+  // ingredients         DishIngredient[] //using other db types other than sqlite
+  notes               Note[]
+  dishOrders          DishOrder[]
+  userFavoriteDishes  UserFavoriteDishes[]
+
+  @@map("dishes")
+}
+
+model DishCategory {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  dish       Dish     @relation(fields: [dishId], references: [id])
+  dishId     String   @map("dish_id")
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String   @map("category_id")
+
+  @@map("dish_categories")
+}
+
+////////////////////////////////Other than SQLite //////////////////////////////////
+// model Ingredient {
+//   id        String           @id @default(uuid())
+//   createdAt DateTime         @default(now()) @map("created_at")
+//   updatedAt DateTime         @updatedAt @map("updated_at")
+//   name      String
+//   isActive  Boolean          @default(true) @map("is_active")
+//   deletedBy String?          @map("deleted_by")
+//   createdBy String?          @map("created_by")
+//   dishes    DishIngredient[]
+
+//   @@map("ingredients")
+// }
+
+// model DishIngredient {
+//   id           String     @id @default(uuid())
+//   createdAt    DateTime   @default(now()) @map("created_at")
+//   updatedAt    DateTime   @updatedAt @map("updated_at")
+//   dish         Dish       @relation(fields: [dishId], references: [id])
+//   dishId       String     @map("dish_id")
+//   ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+//   ingredientId String     @map("ingredients_id")
+
+//   @@map("dish_ingredients")
+// }
+////////////////////////////////Other than SQLite //////////////////////////////////
+
+model Note {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  content   String
+  score     Int
+  isActive  Boolean  @default(true) @map("is_active")
+  deletedBy String?  @map("deleted_by")
+  createdBy String?  @map("created_by")
+  dish      Dish     @relation(fields: [dishId], references: [id])
+  dishId    String   @map("dish_id")
+
+  @@map("notes")
+}
+
+model UserFavoriteDishes {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  isActive  Boolean  @default(true) @map("is_active")
+  deletedBy String?  @map("deleted_by")
+  createdBy String?  @map("created_by")
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  dish      Dish     @relation(fields: [dishId], references: [id])
+  dishId    String   @map("dish_id")
+
+  @@map("user_favorite_dishes")
+}
+
+model Order {
+  id           String      @id @default(uuid())
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+  description  String
+  status       String      @default("PENDING_PAYMENT")
+  totalAmount  Float
+  userId       String      @map("user_id")
+  user         User        @relation(fields: [userId], references: [id])
+  restaurantId String      @map("restaurant_id")
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  dishes       DishOrder[]
+  payment      Payment[]
+
+  @@map("orders")
+}
+
+model DishOrder {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  orderId     String   @map("order_id")
+  order       Order    @relation(fields: [orderId], references: [id])
+  dishId      String   @map("dish_id")
+  dish        Dish     @relation(fields: [dishId], references: [id])
+  quantity    Int
+  totalAmount Float
+
+  @@map("dish_orders")
+}
+
+model Payment {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  orderId     String   @map("order_id")
+  order       Order    @relation(fields: [orderId], references: [id])
+  paymentType String   @map("payment_type")
+  status      String   @default("PENDING")
+  totalAmount Float
+  paymentDate DateTime @map("payment_date")
+
+  @@map("payments")
+}
