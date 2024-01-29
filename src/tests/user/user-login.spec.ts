@@ -9,11 +9,11 @@ describe("Login flow", () => {
   let prisma: PrismaClient;
 
   beforeAll(async () => {
-    const { getPrisma } = await import("@/db_mysql/prisma");
+    const { getPrisma } = await import("../../db_mysql/prisma");
 
     prisma = await getPrisma();
 
-    const { default: main } = await import("@/index");
+    const { default: main } = await import("../../index");
 
     ({ app, server } = await main);
   });
