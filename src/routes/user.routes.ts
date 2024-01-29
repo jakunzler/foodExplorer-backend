@@ -76,7 +76,6 @@ userRouter.patch(
   passport.authenticate("jwt", { session: false }),
   upload.single("avatar"),
   async (request, response, next) => {
-    console.log("user_router 79", request.body);
     try {
       const { updateUserAvatarController } = await UpdateUserAvatar();
       return updateUserAvatarController.handle(request, response, next);

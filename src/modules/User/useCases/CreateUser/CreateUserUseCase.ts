@@ -20,7 +20,6 @@ export default class CreateUserUseCase {
     role,
     createdBy,
   }: CreateUserDTO) {
-
     if (role) {
       const roleExists = await this.prisma.permissionGroups.findFirst({
         where: {
@@ -52,7 +51,6 @@ export default class CreateUserUseCase {
       });
 
       if (newUser) {
-
         // Atribuição de role ao usuário
         const permissions = await this.prisma.permissionGroups.findMany();
         const permission = permissions.find(
@@ -85,7 +83,6 @@ export default class CreateUserUseCase {
         return newUser;
       }
     } else {
-
       const existentUser = await this.prisma.user.findFirst({
         where: {
           email,
@@ -106,15 +103,12 @@ export default class CreateUserUseCase {
       });
 
       if (newUser) {
-
         // Atribuição de role ao usuário
-        const permission = await this.prisma.permissionGroups.findFirst(
-          {
-            where: {
-              role: "IS_CLIENT",
-            },
+        const permission = await this.prisma.permissionGroups.findFirst({
+          where: {
+            role: "IS_CLIENT",
           },
-        ); console.log("IS_CLIENT", permission);
+        });
 
         let user_permission;
         if (permission) {

@@ -1013,8 +1013,6 @@ const createFavoriteDishes = async (prisma: PrismaClient) => {
       dishes.find((d) => d.name === "Salada Ravanello"),
     ];
 
-    console.log(favoriteDishes);
-
     if (user && favoriteDishes.length > 0) {
       favoriteDishes.forEach(async (dish: any) => {
         await prisma.userFavoriteDishes.create({

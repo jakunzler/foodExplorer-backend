@@ -76,8 +76,6 @@ export default class CreateDishUseCase {
       //   (ingredient) => ingredientsNames?.find((i) => i === ingredient.name),
       // );
 
-      console.log(newDishIngredients);
-
       return this.dishRepository.create({
         name: newDishName || "Não há",
         status: newDishStatus || "UNAVAILABLE",

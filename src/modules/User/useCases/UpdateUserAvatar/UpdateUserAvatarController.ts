@@ -14,7 +14,6 @@ export default class UpdateUserAvatarController {
 
       const { userId } = request.params;
       const avatarFilename: string = request.file.filename;
-      console.log(avatarFilename);
 
       const user = await this.updateUserAvatarUseCase.execute(
         userId,

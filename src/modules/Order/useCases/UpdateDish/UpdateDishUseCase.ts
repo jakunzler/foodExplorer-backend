@@ -60,7 +60,7 @@ export default class UpdateDishUseCase {
     //       });
     //   });
     // }
-
+    console.log(updatedDishData);
     const newDishName = updatedDishData.name;
     const newDishStatus =
       updatedDishData.status !== "AVAILABLE"
